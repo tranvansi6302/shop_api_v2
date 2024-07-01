@@ -1,0 +1,80 @@
+'use strict'
+
+const { DataTypes } = require('sequelize')
+const PURCHASE_STATUS = require('../constants/purchaseStatus')
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+    async up(queryInterface, Sequelize) {
+        /**
+         * Add altering commands here.
+         *
+         * Example:
+         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         */
+        await queryInterface.createTable('purchase_orders', {
+            id: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
+
+            // Mã đơn hàng
+            purchase_code: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                unique: true
+            },
+
+            purchase_date: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: new Date()
+            },
+
+            note: {
+                type: DataTypes.TEXT,
+                allowNull: true
+            },
+
+            // 0 đang chờ, 1 đã xác nhận, 2 đã hủy
+            status: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: PURCHASE_STATUS.PENDING
+            },
+
+            user_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'users',
+                    key: 'id'
+                },
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE'
+            },
+
+            created_at: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: new Date()
+            },
+            updated_at: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: new Date()
+            }
+        })
+    },
+
+    async down(queryInterface, Sequelize) {
+        /**
+         * Add reverting commands here.
+         *
+         * Example:
+         * await queryInterface.dropTable('users');
+         */
+        await queryInterface.dropTable('purchase_orders')
+    }
+}
